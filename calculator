@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级计算器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #00b894;
+            --background-color: rgba(255, 255, 255, 0.1);
+            --button-color: rgba(255, 255, 255, 0.2);
+            --function-color: rgba(255, 255, 255, 0.3);
+            --text-color: #ffffff;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --gradient-1: #ee7752;
+            --gradient-2: #e73c7e;
+            --gradient-3: #23a6d5;
+            --gradient-4: #23d5ab;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(-45deg, var(--gradient-1), var(--gradient-2), var(--gradient-3), var(--gradient-4));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .dark-mode {
+            --primary-color: #9b59b6;
+            --secondary-color: #1abc9c;
+            --background-color: rgba(0, 0, 0, 0.6);
+            --button-color: rgba(255, 255, 255, 0.1);
+            --function-color: rgba(255, 255, 255, 0.2);
+            --text-color: #ecf0f1;
+            --gradient-1: #2c3e50;
+            --gradient-2: #34495e;
+            --gradient-3: #2980b9;
+            --gradient-4: #16a085;
+        }
+
+        .calculator {
+            background-color: var(--background-color);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px var(--shadow-color);
+            padding: 40px;
+            width: 340px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+
+        .calculator:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px var(--shadow-color);
+        }
+
+        #display {
+            width: 100%;
+            height: 80px;
+            font-size: 36px;
+            font-weight: 300;
+            text-align: right;
+            margin-bottom: 30px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            transition: box-shadow 0.3s ease;
+        }
+
+        #display:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--primary-color);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        button {
+            width: 100%;
+            height: 70px;
+            font-size: 24px;
+            font-weight: 600;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+            pointer-events: none;
+        }
+
+        button:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px var(--shadow-color);
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .operator {
+            background-color: var(--primary-color);
+        }
+
+        .operator:hover {
+            background-color: rgba(108, 92, 231, 0.8);
+        }
+
+        #equals {
+            background-color: var(--secondary-color);
+        }
+
+        #equals:hover {
+            background-color: rgba(0, 184, 148, 0.8);
+        }
+
+        .function {
+            background-color: var(--function-color);
+        }
+
+        .function:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg);
+        }
+
+        @media (max-width: 480px) {
+            .calculator {
+                width: 90%;
+                padding: 20px;
+            }
+
+            button {
+                height: 60px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle"><i class="fas fa-moon"></i></button>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <div class="buttons">
+            <button class="function" onclick="clearDisplay()"><i class="fas fa-trash-alt"></i></button>
+            <button class="function" onclick="backspace()"><i class="fas fa-backspace"></i></button>
+            <button class="function" onclick="appendToDisplay('(')">(</button>
+            <button class="function" onclick="appendToDisplay(')')">)</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('/')"><i class="fas fa-divide"></i></button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('*')"><i class="fas fa-times"></i></button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('-')"><i class="fas fa-minus"></i></button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button id="equals" onclick="calculate()"><i class="fas fa-equals"></i></button>
+            <button class="operator" onclick="appendToDisplay('+')"><i class="fas fa-plus"></i></button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        const themeToggle = document.getElementById('theme-toggle');
+        const icon = themeToggle.querySelector('i');
+        const root = document.documentElement;
+
+        function appendToDisplay(value) {
+            display.value += value;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function backspace() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        function calculate() {
+            try {
+                const result = evaluateExpression(display.value);
+                display.value = Number.isInteger(result) ? result : result.toFixed(8);
+            } catch (error) {
+                display.value = '错误';
+            }
+        }
+
+        function evaluateExpression(expression) {
+            const tokens = tokenize(expression);
+            const postfix = infixToPostfix(tokens);
+            return evaluatePostfix(postfix);
+        }
+
+        function tokenize(expression) {
+            const regex = /(\d+(\.\d+)?|\+|\-|\*|\/|\(|\))/g;
+            return expression.match(regex);
+        }
+
+        function infixToPostfix(tokens) {
+            const precedence = {'+': 1, '-': 1, '*': 2, '/': 2};
+            const output = [];
+            const operators = [];
+
+            tokens.forEach(token => {
+                if (!isNaN(token)) {
+                    output.push(parseFloat(token));
+                } else if (token === '(') {
+                    operators.push(token);
+                } else if (token === ')') {
+                    while (operators.length && operators[operators.length - 1] !== '(') {
+                        output.push(operators.pop());
+                    }
+                    operators.pop(); // Remove '('
+                } else {
+                    while (operators.length && precedence[operators[operators.length - 1]] >= precedence[token]) {
+                        output.push(operators.pop());
+                    }
+                    operators.push(token);
+                }
+            });
+
+            while (operators.length) {
+                output.push(operators.pop());
+            }
+
+            return output;
+        }
+
+        function evaluatePostfix(postfix) {
+            const stack = [];
+
+            postfix.forEach(token => {
+                if (typeof token === 'number') {
+                    stack.push(token);
+                } else {
+                    const b = stack.pop();
+                    const a = stack.pop();
+                    switch (token) {
+                        case '+': stack.push(a + b); break;
+                        case '-': stack.push(a - b); break;
+                        case '*': stack.push(a * b); break;
+                        case '/':
+                            if (b === 0) throw new Error('除数不能为零');
+                            stack.push(a / b);
+                            break;
+                    }
+                }
+            });
+
+            return stack[0];
+        }
+
+        themeToggle.addEventListener('click', () => {
+            root.classList.toggle('dark-mode');
+            if (root.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key;
+            if (/[0-9+\-*/()\.]/.test(key)) {
+                event.preventDefault();
+                appendToDisplay(key);
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Backspace') {
+                event.preventDefault();
+                backspace();
+            } else if (key === 'Escape') {
+                event.preventDefault();
+                clearDisplay();
+            }
+        });
+
+        clearDisplay();
+    </script>
+</body>
+</html>
